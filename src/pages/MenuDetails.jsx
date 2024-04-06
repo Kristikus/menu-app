@@ -14,7 +14,7 @@ const MenuDetails = () => {
   const [formEdit, setFormEdit] = useState(false);
   const [formData, setFormData] = useState({});
   const [initialData, setInitialData] = useState({});
-  const [deleteMessage, setDeleteMessage] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (menu) {
@@ -29,27 +29,31 @@ const MenuDetails = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e.preventDefault();
     if (menu) {
-      fetch('http://localhost:3001/menus/' + menu._id, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-        .then(() => {
-          console.log('modifié !');
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
-      setFormEdit(false);
-      setInitialData(formData);
-    }
-  };
+      const test = formData !== initialData;
 
-  const handleCancel = () => {
-    setFormEdit(false);
-    setFormData(initialData);
+      if (test) {
+        fetch('http://localhost:3001/menus/' + menu._id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+          .then(() => {
+            console.log('modifié !');
+          })
+          .catch((err) => {
+            console.log(err.message);
+          });
+        setFormEdit(false);
+        setInitialData(formData);
+        setMessage('Recette bien modifiéé !');
+      } else {
+        setFormEdit(false);
+        setFormData(initialData);
+      }
+    }
   };
 
   const handleDelete = () => {
@@ -58,7 +62,7 @@ const MenuDetails = () => {
         method: 'DELETE',
       })
         .then(() => {
-          setDeleteMessage(true);
+          setMessage('Recette bien supprimée !');
           setFormEdit(false);
           setFormData('');
         })
@@ -72,17 +76,12 @@ const MenuDetails = () => {
     <div className='menu-details'>
       {isPending && <div>Loading...</div>}
       {error && <div>{error}</div>}
-      {deleteMessage && (
-        <>
-          <p>Recette supprimée avec succès !</p>
-          <button onClick={() => navigate('/')}>Retour à l'accueil</button>
-        </>
-      )}
 
       {menu && (
         <div>
           {formEdit ? (
-            <>
+            <form className='form-modify'>
+              <label>Nom du plat : </label>
               <input
                 type='text'
                 value={formData.title}
@@ -93,7 +92,7 @@ const MenuDetails = () => {
                   })
                 }
               ></input>
-
+              <label>Catégorie du plat : </label>
               <select
                 name='category'
                 value={formData.category}
@@ -105,7 +104,7 @@ const MenuDetails = () => {
                 <option value='plat'>plat</option>
                 <option value='dessert'>dessert</option>
               </select>
-
+              <label>Description du plat : </label>
               <input
                 type='text'
                 value={formData.description}
@@ -116,7 +115,7 @@ const MenuDetails = () => {
                   })
                 }
               ></input>
-            </>
+            </form>
           ) : (
             <>
               <h2>{formData.title}</h2>
@@ -128,15 +127,22 @@ const MenuDetails = () => {
       )}
       {formEdit && (
         <>
-          <button onClick={handleCancel}>Annuler</button>
-          <button onClick={handleSave}>Sauvegarder</button>
+          <button onClick={handleSave}>OK</button>
         </>
       )}
-      {!formEdit && !deleteMessage && (
+      {!formEdit && !message && (
         <button onClick={handleChange}>Modifier</button>
       )}
 
-      {!deleteMessage && <button onClick={handleDelete}>Supprimer</button>}
+      {!message && <button onClick={handleDelete}>Supprimer</button>}
+      {message && (
+        <div>
+          <p>
+            <i>{message}</i>
+          </p>
+        </div>
+      )}
+      <button onClick={() => navigate('/')}>Retour à l'accueil</button>
     </div>
   );
 };

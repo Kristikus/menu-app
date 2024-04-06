@@ -4,7 +4,9 @@ const Navbar = () => {
   return (
     <div className='navbar-container'>
       <nav className='navbar'>
-        <h1>Menu App</h1>
+        <NavLink to='/' className='links'>
+          <h1>Menu App</h1>
+        </NavLink>
         <div className='navbar-content'>
           <NavLink to='/' className='links'>
             Accueil

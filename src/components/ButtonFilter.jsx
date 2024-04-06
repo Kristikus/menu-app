@@ -1,10 +1,15 @@
-const ButtonFilter = ({ filteredCategories }) => {
+const ButtonFilter = ({ filteredCategories, handleFilterAllCategories, handleFilterCategory }) => {
+ 
   return (
-    <div>
+    <div className="button-container">
       {filteredCategories.map((category, i) => {
-        return <button key={i}>{category}</button>;
+        return (
+          <button key={i} onClick={() => handleFilterCategory(category)}>
+            {category}
+          </button>
+        );
       })}
-      <button>Tous</button>
+      <button onClick={handleFilterAllCategories}>Tous</button>
     </div>
   );
 };

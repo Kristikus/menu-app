@@ -28,7 +28,7 @@ const Create = () => {
 
   return (
     <div>
-      <h2>Ajouter un nouveau plat</h2>
+      <h2 className='create-h2'>Ajouter un nouveau plat</h2>
       <form onSubmit={handleSubmit}>
         <label>Nom du nouveau plat : </label>
         <input

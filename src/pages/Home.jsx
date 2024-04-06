@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MenuList from '../components/MenuList';
 import useFetch from '../utils/useFetch';
 import ButtonFilter from '../components/ButtonFilter';
@@ -10,15 +10,26 @@ const Home = () => {
     data: menus,
   } = useFetch('http://localhost:3001/menus');
 
-  // nouveau tableau avec les catégories uniques (plat et entrée)
-  const filteredCategories = [
-    // ...new Set(menus?.map((filteredCategory) => filteredCategory.category)),
-    'entrée',
-    'plat',
-    'dessert',
-  ];
+  const allCategories = ['entrée', 'plat', 'dessert'];
+  const [filterCategory, setFilterCategory] = useState(allCategories);
+  const [sortedMenus, setSortedMenus] = useState();
 
-  const [filterCategory, setFilterCategory] = useState(filteredCategories);
+  useEffect(() => {
+    const sorted = menus?.toSorted((a, b) => (a.title > b.title ? 1 : -1));
+    setSortedMenus(sorted);
+  }, [menus]);
+
+  const handleFilterAllCategories = () => {
+    setFilterCategory(allCategories);
+  };
+
+  const handleFilterCategory = (category) => {
+    setFilterCategory([category]);
+  };
+
+  const filteredMenus = sortedMenus?.filter((menu) =>
+    filterCategory?.includes(menu.category)
+  );
 
   return (
     <div className='home'>
@@ -27,13 +38,16 @@ const Home = () => {
           <h2>Filtres</h2>
           {menus && (
             <ButtonFilter
-              filteredCategories={filteredCategories}
-              setFilterCategory={setFilterCategory}
+              filteredCategories={allCategories}
+              handleFilterAllCategories={handleFilterAllCategories}
+              handleFilterCategory={handleFilterCategory}
             />
           )}
         </div>
-        {menus && <MenuList titre='Toutes les recettes' menus={menus} />}
-        {isPending && <div>Loading...</div>}
+        {menus && (
+          <MenuList titre='Toutes les recettes' menus={filteredMenus} />
+        )}
+        {isPending && <div>En attente...</div>}
         {error && <div>{error}</div>}
       </div>
     </div>
